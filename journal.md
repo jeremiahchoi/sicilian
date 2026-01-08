@@ -2,7 +2,7 @@
 
 **Journal #2**
 
-**Date:** Jan 8, 2026
+**Date:** Jan 8, 2026 (1:36pm)
 
 **Focus:** Deep Learning Architecture & CNN Theory
 
@@ -38,7 +38,7 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 
 **Journal #1**
 
-**Date**: January 8, 2026 
+**Date**: January 8, 2026 (12:30pm)
 
 **Focus**: Infrastructure & ETL Pipeline
 
@@ -53,6 +53,7 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 **The Problem: Scalability (The RAM Bottleneck)** The Lichess dataset is massive (millions of games). Loading a .pgn file into a standard Python list would crash the memory (RAM).
 - The Solution: I implemented a Python Generator using the yield keyword.
 - Outcome: This creates a "lazy loader" that streams one game at a time from the disk, processes it, and discards it. Memory usage remains constant O(1) regardless of file size.
+
 
 
 
