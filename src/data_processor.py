@@ -72,3 +72,17 @@ def stream_games(file_path):
 
             # Pause here and give game to caller
             yield game
+
+def encode_move(move: chess.Move) -> tuple: 
+    """
+    Converts a chess.Move object into two integers representing the
+    start and end squares (0-63)
+
+    Args: 
+        move (chess.Move): The move to encode.
+    
+    Returns:
+        tuple: (from_square_index, to_square_index)
+    """
+
+    return move.from_square, move.to_square

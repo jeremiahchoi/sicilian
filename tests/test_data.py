@@ -6,7 +6,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.data_processor import board_to_tensor, stream_games
+from src.data_processor import board_to_tensor, stream_games, encode_move
 
 # -- Test 1: Tensor Conversion Logic ---
 def test_tensor_shape():
@@ -61,3 +61,18 @@ def test_stream_games():
         # Cleanup
         if os.path.exists(temp_filename):
             os.remove(temp_filename)
+
+def test_encode_move():
+    """Test converting a move object into two integers (from_square, to_square)"""
+    # Create a move 'e2e4'
+    # e2 is square 12, e4 is square 28 (in python-chess internals)
+    move = chess.Move.from_uci("e2e4")
+    from_sq, to_sq = encode_move(move)
+
+    # Check against python-chess constants directly to be safe
+    assert from_sq == chess.E2
+    assert to_sq == chess.E4
+
+    # explicity check for sanity
+    assert isinstance(from_sq, int)
+    assert isinstance(to_sq, int)
