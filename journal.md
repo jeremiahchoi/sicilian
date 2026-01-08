@@ -40,7 +40,7 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 
 **Date**: January 8, 2026 
 
-**Phase**: Infrastructure & ETL Pipeline
+**Focus**: Infrastructure & ETL Pipeline
 
 **The Problem:** Data Representation I needed to convert a standard Chess Board state (64 squares with pieces) into a format a Convolutional Neural Network (CNN) can process.
 
@@ -53,5 +53,6 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 **The Problem: Scalability (The RAM Bottleneck)** The Lichess dataset is massive (millions of games). Loading a .pgn file into a standard Python list would crash the memory (RAM).
 - The Solution: I implemented a Python Generator using the yield keyword.
 - Outcome: This creates a "lazy loader" that streams one game at a time from the disk, processes it, and discards it. Memory usage remains constant O(1) regardless of file size.
+
 
 
