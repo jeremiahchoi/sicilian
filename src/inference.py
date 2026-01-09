@@ -12,27 +12,49 @@ from src.data_processor import board_to_tensor
 
 def get_ai_move(model, board, device):
     """
-    Returns the predicted move strings (from, to) AND the raw confidence scores.
+    Selects the best LEGAL move based on the model's confidence scores.
     """
     model.eval()
     
-    # 1. Convert Board -> Numpy
+    # 1. Prepare Data
     numpy_board = board_to_tensor(board)
+    tensor = torch.from_numpy(numpy_board).unsqueeze(0).to(device)
     
-    # 2. Convert Numpy -> PyTorch Tensor <--- THIS WAS MISSING
-    tensor = torch.from_numpy(numpy_board)
-    
-    # 3. Add Batch Dimension (unsqueeze) and move to GPU/CPU
-    tensor = tensor.unsqueeze(0).to(device)
-    
+    # 2. Get Raw Logits (Scores) from the Brain
     with torch.no_grad():
         out_from, out_to = model(tensor)
         
-    # Get the best indices
-    from_idx = torch.argmax(out_from).item()
-    to_idx = torch.argmax(out_to).item()
+    # Remove batch dimension: (1, 64) -> (64)
+    out_from = out_from.squeeze()
+    out_to = out_to.squeeze()
     
-    return chess.square_name(from_idx), chess.square_name(to_idx)
+    # 3. Get All Legal Moves (The "Mask")
+    legal_moves = list(board.legal_moves)
+    
+    if not legal_moves:
+        return None, None 
+        
+    # 4. Score Only the Legal Moves
+    best_score = -float('inf')
+    best_move = None
+    
+    # We loop through legal moves and see which one the Brain likes best
+    for move in legal_moves:
+        f = move.from_square
+        t = move.to_square
+        
+        # Score = Brain's desire to move FROM here + Brain's desire to move TO there
+        score = out_from[f].item() + out_to[t].item()
+        
+        if score > best_score:
+            best_score = score
+            best_move = move
+            
+    # 5. Return the winner
+    from_sq_name = chess.square_name(best_move.from_square)
+    to_sq_name = chess.square_name(best_move.to_square)
+    
+    return from_sq_name, to_sq_name
 
 def play():
     # 1. Setup
