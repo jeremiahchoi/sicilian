@@ -1,5 +1,38 @@
 # Project: Behavioral Cloning Chess Engine 
 
+## Journal #4
+
+**Date:** Jan 8, 2026 (5:05pm)
+
+**Focus:** First Inference Test
+
+**The Test Case**
+
+I played a game against the model (trained on 5,000 GM games) using the command line interface. I chose Black and played the Sicilian Defense (1... c5), fittingly for the repo name.
+
+**Observations**
+- Move 1 (White): AI played e2e4. (Perfect).
+- Move 2 (White): After I played c5, AI played g1f3. (Perfect Main Line).
+- Move 3 (White): After I played e6, AI attempted c2d4 (illegal). The theoretical move is d2d4 (The Open Sicilian).
+
+**Interpretation** 
+
+The AI correctly identified the strategic goal (control d4, break the center), but suffered a "Coordinate Hallucination." It selected the c2 pawn instead of d2.
+
+**Technical Analysis**
+ - This error reveals the current limitation of the model: Spatial Precision vs. Pattern Recognition.
+ - The CNN (Layer 3) successfully recognized the "Open Sicilian" pattern.
+ - The Output Head (Linear) failed to distinguish between the c2 and d2 squares, likely because they share very similar feature maps (both are pawns in front of the King/Queen).
+
+**Conclusion**
+
+The model has moved past "Random Play" and entered the "Student Phase." It knows what to do (play the Open Sicilian), but it is clumsy in execution. This suggests that while 5,000 games is enough to learn concepts, I likely need more training epochs or a lower learning rate to refine the precision of the output heads.
+
+Next Step: How to fix the "clumsiness"?
+- The model "knows" the right idea but misses by one square. This is usually fixed by:
+- More Training: 5 epochs might not be enough for the weights to settle on exact coordinates.
+- Learning Rate Decay: Lowering the learning rate (lr=0.0001) after a few epochs so it stops "overshooting" the correct square.
+
 ## Journal #3
 
 **Date:** Jan 8, 2026 (3:45pm)
@@ -105,6 +138,7 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 The Lichess dataset is massive (millions of games). Loading a .pgn file into a standard Python list would crash the memory (RAM).
 - The Solution: I implemented a Python Generator using the yield keyword.
 - Outcome: This creates a "lazy loader" that streams one game at a time from the disk, processes it, and discards it. Memory usage remains constant O(1) regardless of file size.
+
 
 
 
