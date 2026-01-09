@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 import chess
 import numpy as np
 import sys
@@ -12,7 +13,7 @@ from src.data_processor import board_to_tensor
 
 def get_ai_move(model, board, device):
     """
-    Selects the best LEGAL move based on the model's confidence scores.
+    Selects the best LEGAL move and prints the Top 3 candidates with probabilities.
     """
     model.eval()
     
@@ -20,37 +21,49 @@ def get_ai_move(model, board, device):
     numpy_board = board_to_tensor(board)
     tensor = torch.from_numpy(numpy_board).unsqueeze(0).to(device)
     
-    # 2. Get Raw Logits (Scores) from the Brain
+    # 2. Get Raw Logits
     with torch.no_grad():
         out_from, out_to = model(tensor)
         
-    # Remove batch dimension: (1, 64) -> (64)
+    # Remove batch dimension
     out_from = out_from.squeeze()
     out_to = out_to.squeeze()
     
-    # 3. Get All Legal Moves (The "Mask")
+    # 3. Convert Logits to Probabilities (0.0 to 1.0) using Softmax
+    probs_from = F.softmax(out_from, dim=0)
+    probs_to = F.softmax(out_to, dim=0)
+    
+    # 4. Score All Legal Moves
     legal_moves = list(board.legal_moves)
-    
     if not legal_moves:
-        return None, None 
+        return None, None
         
-    # 4. Score Only the Legal Moves
-    best_score = -float('inf')
-    best_move = None
+    candidates = []
     
-    # We loop through legal moves and see which one the Brain likes best
     for move in legal_moves:
         f = move.from_square
         t = move.to_square
         
-        # Score = Brain's desire to move FROM here + Brain's desire to move TO there
-        score = out_from[f].item() + out_to[t].item()
+        # The probability of a move is P(From) * P(To)
+        # e.g., 0.5 (50% sure of piece) * 0.5 (50% sure of destination) = 0.25 (25%)
+        move_prob = probs_from[f].item() * probs_to[t].item()
         
-        if score > best_score:
-            best_score = score
-            best_move = move
-            
-    # 5. Return the winner
+        candidates.append((move_prob, move))
+        
+    # 5. Sort by Confidence (High to Low)
+    candidates.sort(key=lambda x: x[0], reverse=True)
+    
+    # 6. Print Debug Info (The "Inner Monologue")
+    print("\n--- AI Thought Process ---")
+    for i, (prob, move) in enumerate(candidates[:3]):
+        print(f"{i+1}. {move} ({prob*100:.1f}%)")
+        
+    if len(candidates) > 3:
+        print(f"... ({len(candidates)-3} other legal moves)")
+        
+    # 7. Pick the winner
+    best_move = candidates[0][1]
+    
     from_sq_name = chess.square_name(best_move.from_square)
     to_sq_name = chess.square_name(best_move.to_square)
     
