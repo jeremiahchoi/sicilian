@@ -65,35 +65,25 @@ def process_pgn_to_dataset(pgn_path, output_dir, max_games=1000):
 if __name__ == "__main__":
     raw_dir = "data/raw"
     processed_dir = "data/processed"
-    os.makedirs(raw_dir, exist_ok=True)
     
-    # Create Dummy PGN
-    dummy_pgn_path = os.path.join(raw_dir, "test_games.pgn")
-    dummy_data = """
-[Event "Test Game 1"]
-[Result "0-1"]
-1. f3 e5 2. g4 Qh4# 0-1
-
-[Event "Test Game 2"]
-[Result "*"]
-1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 *
-"""
-    with open(dummy_pgn_path, "w") as f:
-        f.write(dummy_data)
-        
-    # Run pipeline
-    output_file = process_pgn_to_dataset(dummy_pgn_path, processed_dir)
+    # 1. Point to the Real Data (The file created by download_data.py)
+    pgn_path = os.path.join(raw_dir, "grandmaster_games.pgn")
     
-    # Verify
-    if output_file: # Check if it's not None
-        print("\n--- VERIFICATION ---")
-        data = np.load(output_file)
-        inputs = data['inputs']
-        print(f"Input Shape: {inputs.shape}") 
+    if os.path.exists(pgn_path):
+        print(f"Found real data at {pgn_path}!")
         
-        if inputs.shape[0] == 10:
-            print("SUCCESS: Count matches expected moves!")
-        else:
-            print(f"WARNING: Expected 10 moves, got {inputs.shape[0]}")
+        # 2. Run the pipeline on the real data
+        # We process up to 5000 games now
+        output_file = process_pgn_to_dataset(pgn_path, processed_dir, max_games=5000)
+        
+        # 3. Verification
+        if output_file:
+            data = np.load(output_file)
+            inputs = data['inputs']
+            print("\n--- VERIFICATION ---")
+            print(f"Input Shape: {inputs.shape}") 
+            print(f"Label Shape: {data['labels'].shape}")
+            print(f"SUCCESS: Dataset created with {inputs.shape[0]} positions!")
     else:
-        print("ERROR: Function returned None!")
+        print(f"ERROR: Could not find {pgn_path}")
+        print("Did you run 'python src/download_data.py' first?")
