@@ -6,6 +6,15 @@
 
 **Focus:** First Inference Test
 
+_Training logs:_
+```
+Epoch 1/5 | Loss: 5.7999
+Epoch 2/5 | Loss: 4.9511
+Epoch 3/5 | Loss: 4.4847
+Epoch 4/5 | Loss: 4.0666
+Epoch 5/5 | Loss: 3.6915
+```
+
 **The Test Case**
 
 I played a game against the model (trained on 5,000 GM games) using the command line interface. I chose Black and played the Sicilian Defense (1... c5), fittingly for the repo name.
@@ -138,6 +147,7 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 The Lichess dataset is massive (millions of games). Loading a .pgn file into a standard Python list would crash the memory (RAM).
 - The Solution: I implemented a Python Generator using the yield keyword.
 - Outcome: This creates a "lazy loader" that streams one game at a time from the disk, processes it, and discards it. Memory usage remains constant O(1) regardless of file size.
+
 
 
 
