@@ -1,18 +1,31 @@
-# Project Roadmap
-## Phase 1: The Translator (Data Pipeline)
-**Goal:** Ensure we can reliably turn a chess move into numbers
-- Test Case 1:
-  - _Logic_: Given a standard board, the output must be exactly `(12,8,8)`
-- Test Case 2:
-  - Place a White Knight on `e4`. The tensor at `channel=1` (white knights), `row=4`,`col=4` must be `1.0`. All other squares in that channel must be `0.0`
+# SicilianZero
 
-## Phase 2: The Model Architecture
-**Goal:** Ensure the neural network accepts the input and produces a legal move format.
-- Test Case 3:
-  - _Logic:_ Pass a random tensor of shape `(1,12,8,8)` into the model. Does it return two vectors `64` (To/From squares)? (Catches dimension mismatch errors immediately)
- 
-## Phase 3: The "Sanity Check"
-**Goal:** Prove the model can learn
-- Test Case 4:
-  - _Logic:_ Take **one** game position. Train the model on only that position for 100 epochs.
-  - _Pass Condition:_ Loss must go to nearly 0
+# To-do
+
+## 1. Implement Legal Move Masking (Inference)
+**Goal:** Prevent the AI from suggesting illegal moves so we don't need the "Random Fallback."
+
+**Current Behavior:**
+1. Model outputs raw scores for all 64 "From" squares and 64 "To" squares.
+2. We pick the `argmax` (highest score).
+3. If illegal, we play a random move.
+
+**Proposed Solution:**
+1. Get the list of all `legal_moves` from the `python-chess` board.
+2. Create a "Mask" (a list of zeros) for the 64x64 possibilities.
+3. Set the Mask to `1` only for moves that are currently legal.
+4. Multiply `Model_Output * Mask`.
+5. Select the highest score from the *remaining* options.
+
+**Benefit:**
+The AI will never make an illegal move, and its "second choice" (e.g., the correct Knight) will automatically win.
+
+## 2. Upgrade Model Architecture (ResNet)
+**Goal:** Improve strategic depth.
+- Replace the simple 3-layer CNN with a Residual Network (ResNet) block.
+- This allows for deeper networks (10+ layers) without vanishing gradients.
+
+## 3. Self-Play Reinforcement Learning
+**Goal:** Let the AI train itself.
+- Instead of learning from GM games, let the AI play against itself.
+- If it wins, reinforce the moves it made.
