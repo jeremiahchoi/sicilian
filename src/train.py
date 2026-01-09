@@ -48,12 +48,22 @@ def train(npz_path, epochs=10, batch_size=32, learning_rate=0.001):
     # 3. Init model
     model = ChessNet().to(device)
 
-    # 4. Define Loss Function and Optimizer
+    # Load existing weights if they exist (Resume Training) ---
+    model_path = "models/chess_model.pth"
+    if os.path.exists(model_path):
+        print("Loading existing model to continue training...")
+        model.load_state_dict(torch.load(model_path, map_location=device))
+    else:
+        print("Starting training from scratch...")
+    
+    # 4. Setup Optimizer & Scheduler
     # CrossEntropyLoss is standard for classification (pick 1 out of 64 squares)
     criterion = nn.CrossEntropyLoss()
-
-    # Adam is the "smart" optimizer - adjusts learning rates auto
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    # Every 5 epochs, cut the learning rate in half (0.001 -> 0.0005 -> 0.00025)
+    # This helps the model settle on precise answers (d2 vs c2)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)
 
     # 5. Training Loop
     print("Starting training...")
@@ -97,4 +107,4 @@ def train(npz_path, epochs=10, batch_size=32, learning_rate=0.001):
     print("Model saved to models/chess_model.pth")
 
 if __name__ == "__main__":
-    train("data/processed/chess_dataset.npz", epochs=5)
+    train("data/processed/chess_dataset.npz", epochs=20)
