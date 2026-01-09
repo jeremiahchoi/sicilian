@@ -1,5 +1,31 @@
 # Project: Behavioral Cloning Chess Engine 
 
+## Journal #5
+
+**Date:** Jan 8, 2026 (8:12pm) 
+
+**Focus:** Optimize training with LR Scheduler
+
+**Training Performance**
+
+I extended training to 20 epochs with a Learning Rate Scheduler.
+- Start: Loss 3.37 (Roughly knowing legal moves).
+- Finish: Loss 1.01 (Knowing specific theory).
+- Observation: The scheduler worked perfectly. You can see the loss dropping consistently, proving the model was refining its weights without overfitting or getting stuck.
+
+**The "King's Indian" Mirror**
+
+I played a game opening with the King's Indian Attack (1. Nf3, 2. g3, 3. Bg2, 4. O-O). The AI's Response: It played the King's Indian Defense (1... Nf6, 2... g6, 3... Bg7, 4... O-O).
+
+- Theory Check: The AI played 8 moves of perfect book theory. It mirrored my strategy, fianchettoed its bishop, and castled.
+- Significance: This proves the CNN has successfully learned high-level strategic concepts like "Piece Development" and "King Safety." It didn't just move random pawns; it built a fortress.
+
+**The Remaining Glitch:** 
+
+At Move 9 and 11, the AI attempted illegal moves with the Knight on b8 (b8e5 and b8e1).Analysis: The Knight on b8 is blocked. The AI really wanted to put a Knight on e5 (a strong outpost square).The Failure Mode: The model correctly identified the Goal ("I want a Knight on e5"), but it selected the wrong Source piece (the trapped Knight on b8 instead of a free one).
+
+**Conclusion:** The model has mastered Strategy (Where pieces should be) but still struggles with Tactical Constraints (Which pieces are allowed to go there).
+
 ## Journal #4
 
 **Date:** Jan 8, 2026 (5:05pm)
@@ -147,6 +173,7 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 The Lichess dataset is massive (millions of games). Loading a .pgn file into a standard Python list would crash the memory (RAM).
 - The Solution: I implemented a Python Generator using the yield keyword.
 - Outcome: This creates a "lazy loader" that streams one game at a time from the disk, processes it, and discards it. Memory usage remains constant O(1) regardless of file size.
+
 
 
 
