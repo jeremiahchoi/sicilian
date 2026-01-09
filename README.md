@@ -1,31 +1,26 @@
-# SicilianZero
+# SicilianZero ♟️
 
-# To-do
+**An End-to-End Deep Learning Chess Engine**
 
-## 1. Implement Legal Move Masking (Inference)
-**Goal:** Prevent the AI from suggesting illegal moves so we don't need the "Random Fallback."
+SicilianZero is a computer vision-based chess AI built from scratch using PyTorch. Unlike traditional engines that rely purely on brute-force calculation, SicilianZero uses a **Convolutional Neural Network (CNN)** to evaluate board geometry and "intuitively" predict Grandmaster-level moves.
 
-**Current Behavior:**
-1. Model outputs raw scores for all 64 "From" squares and 64 "To" squares.
-2. We pick the `argmax` (highest score).
-3. If illegal, we play a random move.
+Currently trained on 5,000+ high-Elo games from the Lichess API, the engine has successfully learned complex opening theory—specifically mastering the **Sicilian Najdorf** variation. It utilizes a **Legal Move Masking** inference engine to ensure robustness and valid play.
 
-**Proposed Solution:**
-1. Get the list of all `legal_moves` from the `python-chess` board.
-2. Create a "Mask" (a list of zeros) for the 64x64 possibilities.
-3. Set the Mask to `1` only for moves that are currently legal.
-4. Multiply `Model_Output * Mask`.
-5. Select the highest score from the *remaining* options.
+### 🗺️ Roadmap & To-Do
 
-**Benefit:**
-The AI will never make an illegal move, and its "second choice" (e.g., the correct Knight) will automatically win.
+**Phase 1: The "Mimic" (Completed) ✅**
+- [x] Build ETL pipeline (Lichess API $\to$ PGN $\to$ Binary Tensors)
+- [x] Design 3-Layer CNN Architecture (Policy Network)
+- [x] Implement Multi-Task Learning (From/To Heads)
+- [x] Create CLI for human-vs-AI play
+- [x] Implement Legal Move Masking (Solver-assisted Inference)
 
-## 2. Upgrade Model Architecture (ResNet)
-**Goal:** Improve strategic depth.
-- Replace the simple 3-layer CNN with a Residual Network (ResNet) block.
-- This allows for deeper networks (10+ layers) without vanishing gradients.
+**Phase 2: The "Calculator" (Current Focus) 🚧**
+- [ ] **Add Value Head:** Upgrade architecture to predict Win/Loss probability (eval bar).
+- [ ] **Tactical Search:** Implement a hybrid search algorithm (e.g., MiniMax or MCTS) that uses the Neural Net to prune the tree.
+- [ ] **Tactical Fine-Tuning:** Retrain on puzzle datasets to fix "Blunder Blindness" (The Grandmaster Bias).
 
-## 3. Self-Play Reinforcement Learning
-**Goal:** Let the AI train itself.
-- Instead of learning from GM games, let the AI play against itself.
-- If it wins, reinforce the moves it made.
+**Phase 3: The "Product" (Future) 🚀**
+- [ ] **Visual Interface:** Build a web-based GUI (React/Flask) so users can drag-and-drop pieces instead of using CLI notation.
+- [ ] **Self-Play Reinforcement Learning:** Allow the bot to play against itself to discover novel strategies (AlphaZero style).
+- [ ] **Dockerize:** Containerize the application for easy deployment.
