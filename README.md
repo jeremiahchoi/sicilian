@@ -1,26 +1,41 @@
 # SicilianZero ♟️
 
-**An End-to-End Deep Learning Chess Engine**
+### An End-to-End Deep Learning Chess Engine
 
-SicilianZero is a computer vision-based chess AI built from scratch using PyTorch. Unlike traditional engines that rely purely on brute-force calculation, SicilianZero uses a **Convolutional Neural Network (CNN)** to evaluate board geometry and "intuitively" predict Grandmaster-level moves.
+SicilianZero is a computer vision-based chess AI I built from scratch using PyTorch.
 
-Currently trained on 5,000+ high-Elo games from the Lichess API, the engine has successfully learned complex opening theory—specifically mastering the **Sicilian Najdorf** variation. It utilizes a **Legal Move Masking** inference engine to ensure robustness and valid play.
+**Why I built this:**
+This is a personal learning project, not an attempt to dethrone Stockfish. My goal is to get hands-on experience with Neural Networks, Computer Vision, and ML Pipelines by applying them to a problem I’m passionate about: Chess. I wanted to see if I could build a "brain" that plays intuitively rather than just calculating millions of variations.
 
-### 🗺️ Roadmap & To-Do
+Unlike traditional engines that rely heavily on brute-force calculation, SicilianZero uses a **Convolutional Neural Network (CNN)** to "look" at the board geometry and predict moves based on patterns it learned from data.
 
-**Phase 1: The "Mimic" (Completed) ✅**
-- [x] Build ETL pipeline (Lichess API $\to$ PGN $\to$ Binary Tensors)
-- [x] Design 3-Layer CNN Architecture (Policy Network)
-- [x] Implement Multi-Task Learning (From/To Heads)
-- [x] Create CLI for human-vs-AI play
-- [x] Implement Legal Move Masking (Solver-assisted Inference)
+Currently, I'm training it on a hybrid dataset of **5,000+ high-Elo Grandmaster games** and **20,000+ tactical puzzles**. This "Mixed Training" approach has taught the engine to play sharp theoretical openings (specifically the **Sicilian Najdorf**) while developing the "killer instinct" needed to find checkmates.
 
-**Phase 2: The "Calculator" (Current Focus) 🚧**
-- [ ] **Add Value Head:** Upgrade architecture to predict Win/Loss probability (eval bar).
-- [ ] **Tactical Search:** Implement a hybrid search algorithm (e.g., MiniMax or MCTS) that uses the Neural Net to prune the tree.
-- [ ] **Tactical Fine-Tuning:** Retrain on puzzle datasets to fix "Blunder Blindness" (The Grandmaster Bias).
+---
 
-**Phase 3: The "Product" (Future) 🚀**
-- [ ] **Visual Interface:** Build a web-based GUI (React/Flask) so users can drag-and-drop pieces instead of using CLI notation.
-- [ ] **Self-Play Reinforcement Learning:** Allow the bot to play against itself to discover novel strategies (AlphaZero style).
-- [ ] **Dockerize:** Containerize the application for easy deployment.
+## ✅ Current Features
+
+* **Deep Learning Pipeline:** End-to-end ETL system that streams matches from the Lichess API, parses PGNs, and converts board states into 12-channel binary tensors.
+* **CNN Architecture:** A custom 3-Layer Policy Network (PyTorch) with separate heads for predicting "From" and "To" squares.
+* **"Winner-Only" Learning:** The training pipeline strictly filters for moves made by the winning side of Grandmaster games, preventing the AI from learning losing patterns.
+* **Tactical Bootcamp:** Integrated a dataset of 20,000 Lichess puzzles (Mates in 1-5, Forks, Pins) to fix the AI's passive play style.
+* **Inference Engine:** A CLI-based interface for human-vs-AI play, featuring a Legal Move Masker to ensure the Neural Net never attempts invalid moves.
+* **Mac Optimization:** Full support for Apple Metal (MPS) acceleration for faster training on M-series chips.
+
+## 🚧 To-Do List
+
+* **Defensive Awareness:** The bot is currently a "Glass Cannon"—it attacks well but struggles to see when *it* is about to be mated. I need to implement "Anti-Blunder" heuristics.
+* **Hybrid Search:** Implement a lightweight search algorithm (like MiniMax or MCTS) that uses the CNN to prune the tree, adding "calculation" to its "intuition."
+* **Web Interface:** Build a simple web-based GUI (React/Flask) so I can drag-and-drop pieces instead of typing coordinates.
+* **Self-Play RL:** Allow the bot to play against itself to discover novel strategies (AlphaZero style).
+* **Docker Support:** Containerize the application for easier deployment and reproducibility.
+
+---
+
+## 🛠️ Tech Stack
+* **Core:** Python 3.10+, PyTorch
+* **Data:** Lichess API, `python-chess`, NumPy, Pandas
+* **Hardware Acceleration:** Apple MPS (Metal Performance Shaders)
+
+## 🚀 Getting Started
+Todo
