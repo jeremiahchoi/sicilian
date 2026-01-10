@@ -7,48 +7,52 @@ import sys
 # Import from your package
 from src.data_processor import stream_games, board_to_tensor, encode_move
 
-def process_pgn_to_dataset(pgn_path, output_dir, max_games=1000):
-    """
-    Reads a PGN file, converts games to tensors/labels, and saves them.
-    """
+def process_pgn_to_dataset(pgn_path, output_dir, max_games=5000):
     os.makedirs(output_dir, exist_ok=True)
     
     X = [] 
     y = [] 
     
     game_count = 0
-    move_count = 0
     
     print(f"Starting processing for: {pgn_path}")
+    print("Strategy: Winner-Only Filtering (Ignoring losers and draws)")
     
-    # --- LOOP STARTS HERE ---
     for game in stream_games(pgn_path):
         if game_count >= max_games:
             break
             
+        # 1. Determine the Winner
+        result = game.headers.get("Result", "*")
+        if result == "1-0":
+            winning_color = chess.WHITE
+        elif result == "0-1":
+            winning_color = chess.BLACK
+        else:
+            continue # Skip draws and unknown results
+            
         board = game.board()
         
         for move in game.mainline_moves():
-            tensor = board_to_tensor(board)
-            X.append(tensor)
+            # 2. FILTER: Only record the move if it was made by the Winner
+            if board.turn == winning_color:
+                tensor = board_to_tensor(board)
+                X.append(tensor)
+                
+                from_sq, to_sq = encode_move(move)
+                y.append([from_sq, to_sq])
             
-            from_sq, to_sq = encode_move(move)
-            y.append([from_sq, to_sq])
-            
+            # Always push the move to advance the board, even if we didn't save it
             board.push(move)
-            move_count += 1
             
         game_count += 1
-        if game_count % 10 == 0:
+        if game_count % 100 == 0:
             print(f"Processed {game_count} games...")
-    # --- LOOP ENDS HERE --- 
-    # (Make sure the code below is aligned with the 'for' loop, NOT inside it)
 
-    # Convert lists to numpy arrays
+    # Convert and Save
     X_array = np.array(X, dtype=np.float32) 
     y_array = np.array(y, dtype=np.int64)   
     
-    # Save to disk
     output_filename = os.path.join(output_dir, "chess_dataset.npz")
     print(f"Saving dataset: {X_array.shape} samples to {output_filename}...")
     
@@ -58,32 +62,14 @@ def process_pgn_to_dataset(pgn_path, output_dir, max_games=1000):
         labels=y_array
     )
     print("Done!")
-    
-    return output_filename # <--- CRITICAL: This must be here!
+    return output_filename
 
-# --- MAIN BLOCK ---
 if __name__ == "__main__":
     raw_dir = "data/raw"
     processed_dir = "data/processed"
-    
-    # 1. Point to the Real Data (The file created by download_data.py)
     pgn_path = os.path.join(raw_dir, "grandmaster_games.pgn")
     
     if os.path.exists(pgn_path):
-        print(f"Found real data at {pgn_path}!")
-        
-        # 2. Run the pipeline on the real data
-        # We process up to 5000 games now
-        output_file = process_pgn_to_dataset(pgn_path, processed_dir, max_games=5000)
-        
-        # 3. Verification
-        if output_file:
-            data = np.load(output_file)
-            inputs = data['inputs']
-            print("\n--- VERIFICATION ---")
-            print(f"Input Shape: {inputs.shape}") 
-            print(f"Label Shape: {data['labels'].shape}")
-            print(f"SUCCESS: Dataset created with {inputs.shape[0]} positions!")
+        process_pgn_to_dataset(pgn_path, processed_dir, max_games=5000)
     else:
         print(f"ERROR: Could not find {pgn_path}")
-        print("Did you run 'python src/download_data.py' first?")
