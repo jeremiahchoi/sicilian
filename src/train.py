@@ -107,4 +107,4 @@ def train(npz_path, epochs=10, batch_size=32, learning_rate=0.001):
     print("Model saved to models/chess_model.pth")
 
 if __name__ == "__main__":
-    train("data/processed/chess_dataset.npz", epochs=20)
+    train("data/processed/chess_dataset.npz", epochs=15)
