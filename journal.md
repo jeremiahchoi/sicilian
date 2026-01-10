@@ -1,5 +1,30 @@
 # Project: Behavioral Cloning Chess Engine
 
+## Journal #9
+
+**Date:** Jan 9, 2026 (11:40pm)
+
+**Focus:** Failure Analysis (The "Polite" Blunder)
+
+**The Strategy: Reality Check**
+
+I took the "Strategy + Violence" model out for a live test to see if the puzzle training improved its tactical awareness.
+- **Expectation:** The AI should punish blunders and take free pieces.
+- **Reality:** The AI ignored a free Queen because it was too focused on "looking proper."
+
+**Gameplay Analysis: Sicilian Defense vs. AI**
+
+I played **White** against the AI (Black).
+- **The Moves:** 1. e4 c5 2. d4 cxd4 3. Qxd4 Nc6 (The AI attacks my Queen).
+- **The Test:** I played 4. Nf3??, deliberately leaving my Queen on d4 to be captured by the Knight on c6.
+- **The AI's Response:** Instead of taking the free Queen (...Nxd4), the AI played **4... Nf6??**.
+- **Diagnosis:** This is **Context Blindness** at its peak. The move ...Nf6 is a standard, "high-probability" Sicilian move. The model saw the pattern "Sicilian Defense" and output the most common developing move, completely failing to check if it could win the game on the spot.
+- **Verdict:** The AI has learned *manners* (standard development) but lacks *killer instinct* (material greed). It is hallucinating a normal game instead of reacting to the board in front of it.
+
+**Conclusion**
+
+The model is "over-socialized." It wants to play a "normal" game of chess so badly that it refuses to deviate from standard theory, even when the opponent hangs a Queen. I need to implement a **Greedy Check** (can I take a piece for free?) alongside the Safety Check.
+
 ## Journal #8
 
 **Date:** Jan 9, 2026 (6:53pm)
@@ -250,6 +275,7 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 The Lichess dataset is massive (millions of games). Loading a .pgn file into a standard Python list would crash the memory (RAM).
 - The Solution: I implemented a Python Generator using the yield keyword.
 - Outcome: This creates a "lazy loader" that streams one game at a time from the disk, processes it, and discards it. Memory usage remains constant O(1) regardless of file size.
+
 
 
 
