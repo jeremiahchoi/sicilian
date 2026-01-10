@@ -1,4 +1,57 @@
-# Project: Behavioral Cloning Chess Engine 
+# Project: Behavioral Cloning Chess Engine
+
+## Journal #8
+
+**Date:** Jan 9, 2026 (6:53pm)
+
+**Focus:** Puzzle Training 
+
+**The Strategy: "Strategy + Violence"**
+
+To fix the AI's passive play, we moved to a Mixed Training Strategy.
+
+- Dataset A: 5,000 Grandmaster Games (Winner-Only) $\rightarrow$ Teaches Structure.
+- Dataset B: 20,000 Lichess Puzzles (Mate in 1-5, Forks) $\rightarrow$ Teaches Tactics.
+- Training: We updated train.py to merge these datasets, forcing the AI to balance "Book Moves" with "Killer Moves."
+
+**Gameplay Analysis: Sicilian Defense vs. Human**
+
+I played White against the new model.
+- Opening: The AI played a sharp Sicilian (1. e4 c5 2. Nf3 Nf6). It correctly challenged the center with 5... f5 and developed active pieces (...Bb4, ...Qc7). This is lightyears ahead of the random shuffling we saw earlier.
+- Middlegame: It castled into safety, showing it understands King Safety concepts.The Blunder: It succumbed to a mating attack (Nf6+ $\to$ Qxh7#).
+- Verdict: The AI has learned to be aggressive, but it lacks Defensive Calculation. It didn't "see" the mate coming because it was trained primarily on delivering mates, not preventing them.
+
+**Conclusion**
+
+The "Bootcamp" worked. The bot is now a dangerous, albeit glass-cannon, opponent. It plays principled chess but needs to learn defensive resilience.
+
+## Journal #7
+
+**Date:** Jan 9, 2026 (5:11pm)
+
+**Focus:** The "Value Head" Experiment & Winner-Only Filtering
+
+**The Experiment: Adding a Critic (Value Head)**
+
+I attempted to upgrade SicilianZero by adding a Value Head—a secondary output in the Neural Network to predict the game winner (-1.0 to 1.0).
+- The Goal: To let the AI "calculate" by evaluating future board states, solving the "Blunder Blindness" problem.
+- The Result: The Value Head successfully learned to evaluate Grandmaster games (Loss: 0.13), but failed in practice due to Distribution Shift.
+- The Failure Mode: When faced with a "stupid" move (like a blunder), the Value Head—having never seen it in training—often "hallucinated" that the blunder was actually a winning move. This caused the AI to prefer chaos over safe play.
+
+**"Winner-Only" Policy Learning**
+I made the  decisin to revert the architecture to a pure Policy Network (Level 1) but drastically improve the Data Quality.
+
+ - New Strategy: "Winner-Only Filtering."
+ - Implementation: We updated make_dataset.py to discard all moves made by the losing side or in drawn games.
+ - The Theory: If the AI only mimics winners, it naturally filters out the "losing patterns" that crept into the previous model.
+
+**Gameplay Analysis: The "Poser" Problem**
+
+I tested the new "Winner-Only" model against the English Attack.
+
+ - The Good: It played the Sicilian Najdorf opening theory perfectly (...a6, ...e6, ...Be7). It "looks" like a Grandmaster.
+ - The Bad: In the middlegame, it played ...Nd4. While visually appealing (centralizing a Knight), it was a blunder.
+ - Verdict: The AI has learned Strategic Posture (where pieces usually go) but still lacks Tactical Awareness (why pieces go there). It is mimicking style without understanding consequences.
 
 ## Journal #6
 
@@ -197,6 +250,8 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 The Lichess dataset is massive (millions of games). Loading a .pgn file into a standard Python list would crash the memory (RAM).
 - The Solution: I implemented a Python Generator using the yield keyword.
 - Outcome: This creates a "lazy loader" that streams one game at a time from the disk, processes it, and discards it. Memory usage remains constant O(1) regardless of file size.
+
+
 
 
 
