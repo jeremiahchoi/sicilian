@@ -53,7 +53,10 @@ def process_pgn_to_dataset(pgn_path, output_dir, max_games=5000):
     X_array = np.array(X, dtype=np.float32) 
     y_array = np.array(y, dtype=np.int64)   
     
-    output_filename = os.path.join(output_dir, "chess_dataset.npz")
+    
+    #output_filename = os.path.join(output_dir, "chess_dataset.npz")
+    output_filename = os.path.join(output_dir, "tactics_dataset.npz")
+
     print(f"Saving dataset: {X_array.shape} samples to {output_filename}...")
     
     np.savez_compressed(
@@ -67,9 +70,11 @@ def process_pgn_to_dataset(pgn_path, output_dir, max_games=5000):
 if __name__ == "__main__":
     raw_dir = "data/raw"
     processed_dir = "data/processed"
-    pgn_path = os.path.join(raw_dir, "grandmaster_games.pgn")
+
+    #pgn_path = os.path.join(raw_dir, "grandmaster_games.pgn")
+    pgn_path = os.path.join(raw_dir, "tactics.pgn")
     
     if os.path.exists(pgn_path):
-        process_pgn_to_dataset(pgn_path, processed_dir, max_games=5000)
+        process_pgn_to_dataset(pgn_path, processed_dir, max_games=50000)
     else:
         print(f"ERROR: Could not find {pgn_path}")
