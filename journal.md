@@ -1,5 +1,30 @@
 # Project: Behavioral Cloning Chess Engine
 
+## Journal #8
+
+**Date:** Jan 9, 2026 (6:53pm)
+
+**Focus:** Puzzle Training 
+
+**The Strategy: "Strategy + Violence"**
+
+To fix the AI's passive play, we moved to a Mixed Training Strategy.
+
+- Dataset A: 5,000 Grandmaster Games (Winner-Only) $\rightarrow$ Teaches Structure.
+- Dataset B: 20,000 Lichess Puzzles (Mate in 1-5, Forks) $\rightarrow$ Teaches Tactics.
+- Training: We updated train.py to merge these datasets, forcing the AI to balance "Book Moves" with "Killer Moves."
+
+**Gameplay Analysis: Sicilian Defense vs. Human**
+
+I played White against the new model.
+- Opening: The AI played a sharp Sicilian (1. e4 c5 2. Nf3 Nf6). It correctly challenged the center with 5... f5 and developed active pieces (...Bb4, ...Qc7). This is lightyears ahead of the random shuffling we saw earlier.
+- Middlegame: It castled into safety, showing it understands King Safety concepts.The Blunder: It succumbed to a mating attack (Nf6+ $\to$ Qxh7#).
+- Verdict: The AI has learned to be aggressive, but it lacks Defensive Calculation. It didn't "see" the mate coming because it was trained primarily on delivering mates, not preventing them.
+
+**Conclusion**
+
+The "Bootcamp" worked. The bot is now a dangerous, albeit glass-cannon, opponent. It plays principled chess but needs to learn defensive resilience.
+
 ## Journal #7
 
 **Date:** Jan 9, 2026 (5:11pm)
@@ -225,6 +250,7 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 The Lichess dataset is massive (millions of games). Loading a .pgn file into a standard Python list would crash the memory (RAM).
 - The Solution: I implemented a Python Generator using the yield keyword.
 - Outcome: This creates a "lazy loader" that streams one game at a time from the disk, processes it, and discards it. Memory usage remains constant O(1) regardless of file size.
+
 
 
 
