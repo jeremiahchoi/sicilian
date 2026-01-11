@@ -1,5 +1,56 @@
 # Project: Behavioral Cloning Chess Engine
 
+## Journal #10
+
+**Date**: Jan 11, 2026 (12:15am)
+
+**Focus:** Building an Evaluation System
+
+**The Strategy: Adding a Judge**
+ - After testing the previous model, it became clear that just copying moves from Grandmaster games isn't enough. The engine was playing moves that "looked" right but didn't actually understand if the position was good or bad. It had a move-predictor (Policy), but it lacked a judge (Value).
+ - I decided to refactor the project into a modular system and created a separate Value Network. The goal is for this second model to look at any board state and provide a score between -1 and 1 to determine who is actually winning.
+
+**The Development: Refactoring and Data**
+ - This session involved restructuring the entire codebase to be cleaner and more organized.
+ - Modular Design: I split the code into separate files for the model, the dataset, and general utilities. This makes it easier to manage the two different networks.
+ - Data Perspective: I set up a new training pipeline that looks at the final result of games. Instead of just learning which move was played, the network now learns whether the current player's position eventually led to a win, loss, or draw.
+ - Broadening the Training: I prepared the system to use a wider variety of high-level games. This helps the model learn that even if a position looks standard, it might be objectively worse if it leads to a loss.
+
+**Current State: The Untested Value Model**
+ - The refactor is done, and the Value Network has been trained. However, the two systems are still working in isolation.
+ - The Player (Policy): Suggests moves based on common patterns and theory.
+ - The Critic (Value): Provides a score for how good the board looks.
+ - The Missing Link: These two models haven't been combined yet. I have the "instinct" and the "judgment" ready, but they aren't talking to each other.
+
+**Conclusion**
+
+The project is now much more professional and follows the same logic used by advanced engines like AlphaZero. The code is modular and the evaluation model is ready. The next step is to write a search algorithm that uses the Value Network to double-check the moves suggested by the Policy Network before they are played.
+
+## Journal #9
+
+**Date:** Jan 9, 2026 (11:40pm)
+
+**Focus:** Failure Analysis (The "Polite" Blunder)
+
+**The Strategy: Reality Check**
+
+I took the "Strategy + Violence" model out for a live test to see if the puzzle training improved its tactical awareness.
+- **Expectation:** The AI should punish blunders and take free pieces.
+- **Reality:** The AI ignored a free Queen because it was too focused on "looking proper."
+
+**Gameplay Analysis: Sicilian Defense vs. AI**
+
+I played **White** against the AI (Black).
+- **The Moves:** 1. e4 c5 2. d4 cxd4 3. Qxd4 Nc6 (The AI attacks my Queen).
+- **The Test:** I played 4. Nf3??, deliberately leaving my Queen on d4 to be captured by the Knight on c6.
+- **The AI's Response:** Instead of taking the free Queen (...Nxd4), the AI played **4... Nf6??**.
+- **Diagnosis:** This is **Context Blindness** at its peak. The move ...Nf6 is a standard, "high-probability" Sicilian move. The model saw the pattern "Sicilian Defense" and output the most common developing move, completely failing to check if it could win the game on the spot.
+- **Verdict:** The AI has learned *manners* (standard development) but lacks *killer instinct* (material greed). It is hallucinating a normal game instead of reacting to the board in front of it.
+
+**Conclusion**
+
+The model is "over-socialized." It wants to play a "normal" game of chess so badly that it refuses to deviate from standard theory, even when the opponent hangs a Queen. I need to implement a **Greedy Check** (can I take a piece for free?) alongside the Safety Check.
+
 ## Journal #8
 
 **Date:** Jan 9, 2026 (6:53pm)
@@ -250,6 +301,8 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 The Lichess dataset is massive (millions of games). Loading a .pgn file into a standard Python list would crash the memory (RAM).
 - The Solution: I implemented a Python Generator using the yield keyword.
 - Outcome: This creates a "lazy loader" that streams one game at a time from the disk, processes it, and discards it. Memory usage remains constant O(1) regardless of file size.
+
+
 
 
 
