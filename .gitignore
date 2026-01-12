@@ -7,4 +7,4 @@ venv/
 dist/
 .env
 .DS_Store
-data/lichess_db_standard_rated_2017-04.pgn.zst
+data/
