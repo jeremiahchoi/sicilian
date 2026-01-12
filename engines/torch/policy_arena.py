@@ -3,7 +3,7 @@ import chess.pgn
 import torch
 import numpy as np
 import datetime
-from model import ChessNet
+from policy_model import PolicyNet
 from utilities import board_to_matrix, get_legal_move_mask
 
 # === CONFIGURATION ===
@@ -18,7 +18,7 @@ DEVICE = 'cpu' # CPU is fast enough for inference
 class ChessAI:
     def __init__(self, model_path, name="AI"):
         self.name = name
-        self.model = ChessNet()
+        self.model = PolicyNet()
         try:
             state_dict = torch.load(model_path, map_location=DEVICE)
             self.model.load_state_dict(state_dict)

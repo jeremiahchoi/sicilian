@@ -97,3 +97,13 @@ def get_legal_move_mask(board: chess.Board):
         mask_indices.append(idx)
         
     return mask_indices
+
+def move_to_index(move):
+    """Converts a chess.Move to an index between 0 and 4095."""
+    return move.from_square * 64 + move.to_square
+
+def index_to_move(index):
+    """Converts an index back into a chess.Move (useful for debugging)."""
+    from_sq = index // 64
+    to_sq = index % 64
+    return chess.Move(from_sq, to_sq)

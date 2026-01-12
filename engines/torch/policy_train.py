@@ -4,7 +4,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 # === IMPORTS FROM YOUR MODULES ===
-from engines.torch.policy_model import ChessNet
+from engines.torch.policy_model import PolicyNet
 from policy_dataset import ChessDataset
 
 # === CONFIGURATION ===
@@ -30,7 +30,7 @@ def train():
     print(f"Training on {len(dataset)} positions...")
 
     # 2. Initialize Model
-    model = ChessNet().to(DEVICE)
+    model = PolicyNet().to(DEVICE)
     
     # 3. Setup Optimizer & Loss
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
