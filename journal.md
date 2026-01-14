@@ -1,5 +1,30 @@
 # Project: Behavioral Cloning Chess Engine
 
+## Journal #11
+
+**Date**: Jan 13, 2026 (11:20pm)
+
+**Focus**: Architecture Overhaul (ResNet) & The Hybrid Engine
+
+**The Strategy: Going Deeper**
+- After implementing the Value head, I realized the standard CNN was hitting a "learning ceiling." It struggled to connect complex board states to long-term outcomes.
+- I upgraded the model architecture to a ResNet (Residual Network). By adding "skip connections," the model can now be trained to be much deeper (4 blocks) without the gradient signal vanishing. This is the same architectural shift that allowed AlphaZero to dominate.
+- I also solved the "static board" problem. By adding a "Ghost Layer" (Channel 18), the model now sees where pieces were one move ago, giving it a sense of momentum and motion.
+- Multi-Task Training: The training loop was updated to balance two competing goals simultaneously: predicting the move (Policy Loss) and predicting the winner (Value Loss).
+- The Hybrid Engine: I built the Engine class to be a true system, not just a network. It now combines three brains:
+- Opening Book: Plays instant GM moves (Polyglot) in the opening.
+- Neural Intuition: Uses the ResNet to sort moves and spot "human-like" candidates.
+- Tactical Search: Uses Alpha-Beta pruning (Minimax) with PeSTO evaluation to verify the network's suggestions.
+
+**Current State: Self-Play Capable**
+- The system is now capable of full autonomous gameplay.
+- I created src/play_self.py, which allows the engine to play against itself.
+- I added a "Scenario Mode" that allows me to force specific openings (like the Sicilian) to test how the engine handles specific middlegame structures without waiting for them to happen randomly.
+
+**Conclusion**
+
+We have moved from a simple predictor to a robust chess engine. The code is modular (utils, engine, model), the architecture is modern (ResNet), and the engine can now play complete, valid games with a mix of memorized theory (Book) and calculated intuition (Search). The next step is to let it play thousands of games to see if the ResNet actually learns strategy or just tactics.
+
 ## Journal #10
 
 **Date**: Jan 11, 2026 (12:15am)
@@ -301,6 +326,7 @@ ReLU (Rectified Linear Unit): I used ReLU to introduce non-linearity.
 The Lichess dataset is massive (millions of games). Loading a .pgn file into a standard Python list would crash the memory (RAM).
 - The Solution: I implemented a Python Generator using the yield keyword.
 - Outcome: This creates a "lazy loader" that streams one game at a time from the disk, processes it, and discards it. Memory usage remains constant O(1) regardless of file size.
+
 
 
 
