@@ -29,6 +29,16 @@ Then open <http://localhost:5173>. Every push to `main` also publishes it to Git
 python3 -m venv venv && ./venv/bin/pip install -r requirements.txt fastapi uvicorn onnx onnxscript onnxruntime && ./venv/bin/python scripts/export_onnx.py
 ```
 
+**What I found.** The full day-by-day log is in [journal.md](journal.md); these are the observations that shaped the project.
+
+1. **It learns goals before coordinates.** Early models wanted the Open Sicilian and pushed the c2 pawn to d4 instead of d2, or tried to jump a blocked b8 knight to e5 because it wanted a knight on e5. Destinations right, source piece wrong. In the demo, the To-squares view is usually more sensible than the From view.
+2. **It is over-socialised.** Trained only on the winning side of grandmaster games, it has never seen a hanging piece. I hung my queen with 4.Nf3?? and it replied 4...Nf6, the normal move. The heatmap will not even glance at a free piece.
+3. **Puzzles made it a glass cannon.** 20,000 mate-in-N puzzles fixed passive play and gave it attacking instinct, but it learned to deliver mates, not prevent them. Look at the squares around its king right before it gets mated.
+4. **Winner-only filtering taught it to pose.** Ten moves of perfect Najdorf theory, then a beautiful centralising knight move that lost on the spot. Style without consequences.
+5. **The value head hallucinates.** It scores grandmaster positions well but rates blunders, which it never saw, as winning. The demo shows it with a warning and never lets it influence the move.
+6. **The ghost layer matters.** From a bare FEN after 1.e4 it plays e5; with the previous position visible it plays c5. Momentum is part of its intuition, which is why the API takes the move list.
+7. **Sampling hid how good it was.** The old harness sampled moves at temperature 0.8, so four moves in ten were not its first choice. Argmax, with the same weights, removed most of the random blunders.
+
 ---
 
 ### An End-to-End Deep Learning Chess Engine

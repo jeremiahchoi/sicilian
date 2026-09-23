@@ -63,10 +63,10 @@ export default function Board({ fen, onDrop, draggable, dist, pmax, labelMin, fo
           customSquareStyles={squareStyles}
           customArrows={arrow ? [[arrow[0], arrow[1], '#f5b942']] : []}
           customArrowColor="#f5b942"
-          customLightSquareStyle={{ backgroundColor: '#333333' }}
-          customDarkSquareStyle={{ backgroundColor: '#232323' }}
+          customLightSquareStyle={{ backgroundColor: '#4a4a4a' }}
+          customDarkSquareStyle={{ backgroundColor: '#303030' }}
           customBoardStyle={{ borderRadius: 10, boxShadow: '0 0 0 1px #2a2a2a, 0 40px 80px rgba(0,0,0,0.7)' }}
-          customNotationStyle={{ color: '#8a877e', fontFamily: "'DM Mono', monospace", fontSize: 10 }}
+          customNotationStyle={{ color: '#a3a096', fontFamily: "'DM Mono', monospace", fontSize: 10 }}
           onMouseOverSquare={(sq) => onHover(sq)}
           onMouseOutSquare={() => onHover(null)}
           onSquareClick={onSquareClick}

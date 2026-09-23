@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { Chess } from 'chess.js'
 import Board from './components/Board.jsx'
 import Dock from './components/Dock.jsx'
+import About from './components/About.jsx'
 import { CertaintyCard, HoverCard, LegendCard, StatsCard } from './components/SideCards.jsx'
 import { analyze } from './api.js'
 import { SQUARES } from './heat.js'
@@ -169,6 +170,7 @@ export default function App() {
         <div className="brand">
           <span className="wordmark">SicilianZero</span>
           <span className={`status ${error ? 'status-error' : ''}`}>{statusText(game, thinking, error)}</span>
+          <a className="about-link" href="#about">what is this?</a>
         </div>
         <div className="toggles">
           <Seg
@@ -238,6 +240,7 @@ export default function App() {
       </main>
 
       <Dock analysis={analysis} thinking={thinking} gameOver={gameOver} pinnedSq={pinnedSq} setPinnedSq={setPinnedSq} />
+      <About />
     </div>
   )
 }
