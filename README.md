@@ -1,5 +1,36 @@
 # SicilianZero ♟️
 
+## 🔍 The demo: watching a policy network think
+
+**What this is.** A visualization of a policy network's intuition. You play White in the browser. After each of your moves the network replies with its single highest-probability legal move, and the board shows the probability distributions behind that choice: which piece it wanted to move, where it wanted that piece to go, and how sure it was.
+
+**What this is not.** A competitive engine. The network (`models/v2/v2_final.pth`, a 1.7M-parameter residual CNN) never looks a single move ahead; there is no search, minimax, or MCTS anywhere in the demo. It blunders, and it will get mated. That is the exhibit: when it is about to be checkmated, look at the heatmap and notice that none of its attention is on the squares around its own king.
+
+**What you see**
+
+- **From squares.** A colour overlay of P(from-square): how much of the network's probability mass wants to move the piece on each square. Hover any square for the exact number.
+- **To squares, conditioned on a piece.** Hover (or click to pin) a piece and the overlay switches to P(to-square | from = that piece). Hovering a candidate in the side panel does the same.
+- **Candidate moves.** The five highest-probability legal moves as bars, with the played move highlighted.
+- **Legal vs raw.** The network outputs one softmax over all 4096 (from, to) pairs. *Legal* renormalises over the legal moves only, which is what picks the move. *Raw* shows the unmasked distribution, illegal squares included; it is the more honest picture of where the net is looking.
+- **How sure was it.** Entropy of the legal distribution (as a certainty percentage), the share of raw probability that lands on legal moves at all, and the value head's guess at the outcome.
+- **The eye button** toggles the overlay off so you can see the board plainly. The colour scale is square-root scaled so the long tail of small probabilities stays visible next to a dominant square; the legend ticks show the actual values.
+
+**Run it.** The model runs in your browser (an ONNX export of the checkpoint via onnxruntime-web), so the demo is a static site. One command, Node 18+:
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+Then open <http://localhost:5173>. Every push to `main` also publishes it to GitHub Pages via `.github/workflows/pages.yml`; enable Pages once in the repo settings with **Source: GitHub Actions** and the site lives at `https://<owner>.github.io/<repo>/`.
+
+**How it is wired.** `frontend/src/engine/` is a line-for-line JavaScript port of the board encoding (`src/utils.py`) and the legal masking (`src/test_model.py`), driving `frontend/public/model/sicilianzero_v2.onnx`. It takes the game's UCI move list rather than a FEN because the network's 18th input plane encodes the previous position; a bare FEN would leave that plane empty, something the model never saw in training. The from-square distribution is the row sum of the 64×64 joint, and the conditional to-square distribution is a renormalised row. `backend/app.py` is the same thing as a FastAPI service on top of the PyTorch checkpoint and remains the reference implementation: `npm run parity` checks the browser engine against it on 61 recorded positions (distributions agree to 5e-6), and CI runs that check before every deploy. To regenerate the ONNX file and the fixture after touching the weights:
+
+```bash
+python3 -m venv venv && ./venv/bin/pip install -r requirements.txt fastapi uvicorn onnx onnxscript onnxruntime && ./venv/bin/python scripts/export_onnx.py
+```
+
+---
+
 ### An End-to-End Deep Learning Chess Engine
 
 SicilianZero is a computer vision-based chess AI I built from scratch using PyTorch.

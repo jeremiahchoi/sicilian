@@ -1,0 +1,23 @@
+{
+  "name": "sicilianzero-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "parity": "node scripts/parity.mjs"
+  },
+  "dependencies": {
+    "chess.js": "^1.4.0",
+    "onnxruntime-web": "^1.30.0",
+    "react": "^18.3.1",
+    "react-chessboard": "4.7.3",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "vite": "^5.4.21"
+  }
+}
