@@ -1,6 +1,13 @@
 export default function About() {
   return (
-    <section className="about" id="about">
+    <aside className="about" id="about">
+      <div className="about-lead">
+        <p>
+          <b>This is not meant to be a good chess engine.</b> It is a window into how a neural network “feels” a
+          position. Play it, and watch the board light up with what it is paying attention to, including everything it
+          is missing.
+        </p>
+      </div>
       <div>
         <h2>What is this?</h2>
         <p>
@@ -113,6 +120,6 @@ export default function About() {
         <a href="https://github.com/jeremiahchoi/sicilian">GitHub</a>. Built with PyTorch, python-chess, React and
         onnxruntime-web. No search, no engine, no retraining for the demo.
       </p>
-    </section>
+    </aside>
   )
 }

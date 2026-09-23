@@ -170,7 +170,6 @@ export default function App() {
         <div className="brand">
           <span className="wordmark">SicilianZero</span>
           <span className={`status ${error ? 'status-error' : ''}`}>{statusText(game, thinking, error)}</span>
-          <a className="about-link" href="#about">what is this?</a>
         </div>
         <div className="toggles">
           <Seg
@@ -212,9 +211,11 @@ export default function App() {
       </header>
 
       <main className="stage">
-        <aside className="side side-left">
+        <aside className="side">
           <LegendCard dist={dist} pmax={pmax} source={source} />
           <HoverCard readout={readout} dist={dist} pinnedSq={pinnedSq} onUnpin={() => setPinnedSq(null)} view={view} />
+          <CertaintyCard analysis={analysis} />
+          <StatsCard analysis={analysis} />
         </aside>
 
         <div className="board-col">
@@ -231,16 +232,11 @@ export default function App() {
             onHover={(sq) => setHoverSq(sq == null ? null : SQUARES.indexOf(sq))}
             onSquareClick={onSquareClick}
           />
+          <Dock analysis={analysis} thinking={thinking} gameOver={gameOver} pinnedSq={pinnedSq} setPinnedSq={setPinnedSq} />
         </div>
 
-        <aside className="side side-right">
-          <CertaintyCard analysis={analysis} />
-          <StatsCard analysis={analysis} />
-        </aside>
+        <About />
       </main>
-
-      <Dock analysis={analysis} thinking={thinking} gameOver={gameOver} pinnedSq={pinnedSq} setPinnedSq={setPinnedSq} />
-      <About />
     </div>
   )
 }

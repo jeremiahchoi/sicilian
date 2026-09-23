@@ -23,7 +23,7 @@ function useBoardWidth() {
   const calc = () => {
     const w = window.innerWidth
     const h = window.innerHeight
-    if (w >= 1100) return Math.max(320, Math.min(576, w - 540, h - 240))
+    if (w >= 1200) return Math.max(360, Math.min(576, w - 680, h - 260))
     return Math.max(280, Math.min(576, w - 32))
   }
   const [width, setWidth] = useState(calc)
