@@ -18,7 +18,7 @@ function AboutMe() {
   const initials = ME.name.split(' ').map((w) => w[0]).join('')
   return (
     <div className="me">
-      <img className="me-avatar" src={ME.avatar} alt="" width="56" height="56" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }} />
+      <img className="me-avatar" src={ME.avatar} alt="" width="88" height="88" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }} />
       <div className="me-initials" aria-hidden="true">{initials}</div>
       <div className="me-text">
         <div className="me-name">{ME.name}</div>
