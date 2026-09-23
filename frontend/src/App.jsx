@@ -168,8 +168,11 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <span className="wordmark">SicilianZero</span>
-          <span className={`status ${error ? 'status-error' : ''}`}>{statusText(game, thinking, error)}</span>
+          <div className="brand-row">
+            <span className="wordmark">SicilianZero</span>
+            <span className="byline">by Jeremiah Choi</span>
+          </div>
+          <span className="tagline">A chess neural network with no search. Play it and watch what it looks at.</span>
         </div>
         <div className="toggles">
           <Seg
@@ -211,14 +214,10 @@ export default function App() {
       </header>
 
       <main className="stage">
-        <aside className="side">
-          <LegendCard dist={dist} pmax={pmax} source={source} />
-          <HoverCard readout={readout} dist={dist} pinnedSq={pinnedSq} onUnpin={() => setPinnedSq(null)} view={view} />
-          <CertaintyCard analysis={analysis} />
-          <StatsCard analysis={analysis} />
-        </aside>
+        <About />
 
         <div className="board-col">
+          <div className={`status ${error ? 'status-error' : ''}`}>{statusText(game, thinking, error)}</div>
           <Board
             fen={fen}
             onDrop={onDrop}
@@ -235,7 +234,13 @@ export default function App() {
           <Dock analysis={analysis} thinking={thinking} gameOver={gameOver} pinnedSq={pinnedSq} setPinnedSq={setPinnedSq} />
         </div>
 
-        <About />
+        <aside className="side">
+          <LegendCard dist={dist} pmax={pmax} source={source} />
+          <HoverCard readout={readout} dist={dist} pinnedSq={pinnedSq} onUnpin={() => setPinnedSq(null)} view={view} />
+          <CertaintyCard analysis={analysis} />
+          <StatsCard analysis={analysis} />
+        </aside>
+
       </main>
     </div>
   )
