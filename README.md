@@ -23,6 +23,26 @@ The day-by-day log is in [journal.md](journal.md). The short version:
 6. **Momentum is part of its intuition.** Given the previous position as an extra input plane, it answers 1.e4 with c5; from a bare FEN it plays e5.
 7. **Sampling hid how good it was.** The old harness sampled moves at temperature 0.8, so four in ten were not its first choice. Argmax with the same weights removed most of the random blunders.
 
+## Technical decisions and lessons
+
+**Decisions**
+
+- **Board as an image, one-hot.** Piece codes 1–6 in a grid would make a king "worth six pawns", so each piece type gets its own binary plane. Later planes add castling rights, the en passant square and the previous position's occupancy: 18×8×8 in total.
+- **Side-to-move encoding.** The board is flipped so the mover is always at the bottom (`square ^ 56`), so one network plays both colours and every learned pattern is shared.
+- **One 4096-way policy head, not two 64-way heads.** The first design predicted from- and to-squares separately, which discards the dependence between them. A joint softmax over (from, to) keeps it; the demo's heatmaps are its marginals and conditionals.
+- **Legality at inference, not in training.** Gather logits at the legal moves and softmax over those. Illegal moves went to zero without touching the model.
+- **A smaller residual net over a bigger plain one.** v1 was three conv layers into an 8192→1024 dense layer: 12.9M parameters, 8.4M in that one layer. v2 is four residual blocks with a 1×1 policy conv: 1.7M parameters, and better.
+- **Multi-task loss.** Cross-entropy on the move index plus MSE on the game result, summed 1:1. Adam at 1e-3 with a scheduler over 20 epochs took policy loss from 3.37 to 1.01.
+
+**Lessons**
+
+- **Distribution shift explains nearly every failure.** Winner-only games contain no hanging pieces, so it cannot punish one; the value head never saw a blunder, so it rates blunders as winning. Data coverage mattered more than any architecture change.
+- **Imitation learns correlation.** It knows where grandmaster pieces usually go, not why.
+- **The decision rule is part of the model.** Sampling at temperature 0.8 versus argmax changed apparent strength more than another training run would have.
+- **Every input feature must be reproducible at serve time.** The previous-position plane is filled by replaying the game; from a bare FEN it is silently empty and the answer changes.
+- **Loss is not evaluation.** A loss of 1.01 looked great. Playing it, and later drawing its distributions, surfaced failure modes no metric showed.
+- **It learned rules it was never told.** After 1.e4, 99.96% of the raw softmax lands on legal moves, although the loss never mentioned legality.
+
 ## How it works
 
 - **Data.** 5,000+ high-Elo games streamed from Lichess (winner's moves only) plus 20,000 Lichess tactical puzzles, encoded as 18×8×8 tensors: 12 piece planes from the side to move's perspective, 4 castling planes, the en passant square, and a "ghost layer" of the previous position's occupancy (`src/utils.py`).

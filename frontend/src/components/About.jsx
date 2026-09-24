@@ -137,6 +137,68 @@ export default function About() {
         </ol>
       </Section>
 
+      <Section title="Technical decisions & lessons">
+        <h4 className="sub">Decisions</h4>
+        <ul className="tech">
+          <li>
+            <b>Board as an image, one-hot.</b> Piece codes 1–6 in a grid would make a king “worth six pawns” to the
+            network, so each piece type gets its own binary plane. Later planes add castling rights, the en passant
+            square, and the previous position’s occupancy: 18 × 8 × 8 in total.
+          </li>
+          <li>
+            <b>Side-to-move encoding.</b> The board is flipped so the mover is always “at the bottom”, so one network
+            plays both colours and every pattern it learns is shared between them.
+          </li>
+          <li>
+            <b>One 4096-way policy, not two 64-way heads.</b> My first design predicted the from-square and the
+            to-square separately, which throws away the dependence between them. A joint softmax over (from, to) keeps
+            it; the heatmaps here are its marginals and conditionals.
+          </li>
+          <li>
+            <b>Legality at inference, not in training.</b> Gather the logits at the legal moves and softmax over those.
+            Illegal moves went from a constant nuisance to zero without touching the model.
+          </li>
+          <li>
+            <b>Smaller residual net over a bigger plain one.</b> v1 was three conv layers feeding a 8192→1024 dense
+            layer: 12.9M parameters, 8.4M of them in that one layer. v2 is four residual blocks with a 1×1 policy conv:
+            1.7M parameters, and better.
+          </li>
+          <li>
+            <b>Multi-task loss.</b> Cross-entropy on the move index plus mean squared error on the game result, summed
+            1:1, so the shared trunk learns features useful for both. Adam at 1e-3 with a scheduler over 20 epochs took
+            the policy loss from 3.37 to 1.01.
+          </li>
+        </ul>
+        <h4 className="sub">Lessons</h4>
+        <ul className="tech">
+          <li>
+            <b>Distribution shift explains nearly every failure.</b> Winner-only games contain no hanging pieces, so the
+            net cannot punish one. The value head never saw a blunder, so it rates blunders as winning. Coverage of the
+            data mattered more than any architecture change.
+          </li>
+          <li>
+            <b>Imitation learns correlation.</b> It knows where grandmaster pieces usually go, not why. Mimicking a
+            style without the consequences produces confident, well-shaped nonsense.
+          </li>
+          <li>
+            <b>The decision rule is part of the model.</b> Sampling at temperature 0.8 versus taking the argmax changed
+            the apparent strength more than an extra training run would have.
+          </li>
+          <li>
+            <b>Every input feature must be reproducible at serve time.</b> The previous-position plane is filled by
+            replaying the game. Feed a bare FEN and it is silently empty, and the net’s answer changes.
+          </li>
+          <li>
+            <b>Loss is not evaluation.</b> A loss of 1.01 looked great. Playing it, and later drawing its distributions,
+            surfaced failure modes no metric showed. The heatmap became the eval tool.
+          </li>
+          <li>
+            <b>It learned the rules it was never told.</b> After 1.e4, 99.96% of the raw softmax lands on legal moves.
+            Legality was absorbed from the data even though the training loss never mentioned it.
+          </li>
+        </ul>
+      </Section>
+
       <Section title="How it works">
         <p>
           A convolutional network, the kind used for image recognition, because a chess board is an 8×8 picture with 18
